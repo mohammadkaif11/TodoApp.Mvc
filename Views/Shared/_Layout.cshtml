@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - notesappp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/notesappp.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">notesappp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - notesappp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script> 
+
+     Getdata();
+function Getdata(){
+let elm=document.getElementById('main')
+$.ajax({  
+    type: "GET",  
+    url: "/Home/Getdata",  
+    success: function(data) {
+     let html= " "
+
+data.forEach(function(element,index){
+    html+=` <div class="card-body notecard">
+          <h5 class="card-title">${element.title}</h5>
+          <p class="card-text ">${element.description}</p>
+          <button class="btn btn-primary" id="${element.id}" onclick="deleteNode(this.id)">delete</button>
+        </div>`
+});
+let elm=document.getElementById('shownote');
+if(data.length != 0){
+     elm.innerHTML=html;
+}
+   
+      console.log(data);  
+
+    },  
+    error: function() {  
+        alert("Error occured!!")  
+    }  
+});
+}
+
+   function AddOnclick(){
+       console.log("add note")
+       var obj={
+       title:$("#title").val(),
+       description:$("#description").val()
+   } 
+   Submitnote(obj);
+    }
+
+function Submitnote(obj){  
+   $.ajax( 
+            {  
+                type: "POST", 
+                url: "Home/PostData",  
+                data: obj,
+                success:function(data){
+                 console.log(data);
+                 console.log("success");
+                 Getdata();
+                },
+                error:function(error){
+                    console.log(error);
+                }
+            }); 
+            
+}
+
+function deleteNode(id){
+     console.log(id);
+    $.ajax(  
+            {  
+                type: "POST", 
+                url: "Home/DeleteData",
+                data:{Id:id},
+                success:function(data){
+                 console.log(data);
+                 console.log("success");
+                 Getdata();
+                },
+                error:function(error){
+                    console.log(error);
+                }
+            }); 
+            
+}
+    </script>
+</body>
+</html>
